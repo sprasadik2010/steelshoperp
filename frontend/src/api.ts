@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:8000'
+// Use Vite's import.meta.env
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 export async function apiCall(endpoint: string, method = 'GET', body?: Record<string, any>) {
   const token = localStorage.getItem('auth_token')
@@ -10,14 +11,21 @@ export async function apiCall(endpoint: string, method = 'GET', body?: Record<st
     opts.headers = { ...opts.headers, 'Authorization': `Bearer ${token}` }
   }
   if (body) opts.body = JSON.stringify(body)
+  
   const res = await fetch(`${API_URL}${endpoint}`, opts)
+  
   if (res.status === 401) {
-    // Token expired or invalid - clear storage and redirect
     localStorage.removeItem('auth_token')
     localStorage.removeItem('auth_user')
     window.location.href = '/'
+    throw new Error('Unauthorized')
   }
-  if (!res.ok) throw new Error(`API error: ${res.status}`)
+  
+  if (!res.ok) {
+    const error = await res.text()
+    throw new Error(`API error: ${res.status} - ${error}`)
+  }
+  
   return res.json()
 }
 
