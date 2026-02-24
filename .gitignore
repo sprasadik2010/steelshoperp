@@ -1,58 +1,93 @@
-# --- React (TypeScript) / Frontend ---
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+venv/
+env/
+.venv/
+venv-erp/
+backend/venv-erp/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Type checkers
+.mypy_cache/
+.pytype/
+.pyre/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node / frontend
 node_modules/
-/dist
-/build
-.vite/
-.eslintcache
+frontend/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+dist/
+build/
+.vite/
+
+# Environment variables
+.env
+.env.*
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-tsconfig.tsbuildinfo
 
-# --- FastAPI / Python Backend ---
-venv/
-.venv/
-__pycache__/
-*.py[cod]
+# Docker
+docker-compose.override.yml
+
+# Logs and databases
+logs/
+*.log
+*.sqlite3
+*.db
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Compiled extensions
+*.pyc
 *.pyo
 *.pyd
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
+
+# Coverage output
+htmlcov/
+
+# Ignore Python egg/binary builds
 *.egg
-
-# FastAPI specific
-.env
-.flaskenv
-.pytest_cache/
-.tox/
-.nox/
-/backend/app/db/migrations/
-/backend/app/main.py
-
-# --- IDEs and Tools ---
-.vscode/
-.idea/
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+*.whl
