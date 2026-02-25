@@ -5,11 +5,12 @@ interface CardProps {
   title?: string
   subtitle?: string
   className?: string
+  style?: React.CSSProperties
 }
 
-export default function Card({ children, title, subtitle }: CardProps) {
+export default function Card({ children, title, subtitle, style }: CardProps) {
   return (
-    <div style={cardStyle}>
+    <div style={{ ...cardStyle, ...style }}>
       {(title || subtitle) && (
         <div style={cardHeaderStyle}>
           {title && <h3 style={cardTitleStyle}>{title}</h3>}

@@ -1,24 +1,25 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useAuth } from '../AuthContext'
 import Navbar from './Navbar'
 import Sidebar from './Sidebar'
 
 interface LayoutProps {
   children: React.ReactNode
-  currentPage: string
-  onPageChange: (page: string) => void
+  currentPage: any
+  onPageChange: React.Dispatch<React.SetStateAction<any>>
 }
 
 export default function Layout({ children, currentPage, onPageChange }: LayoutProps) {
   const { user } = useAuth()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <div style={layoutStyle}>
-      <Navbar onPageChange={onPageChange} />
-      <div style={mainContainerStyle}>
-        <Sidebar currentPage={currentPage} onPageChange={onPageChange} userRole={user?.role} />
-        <main style={contentStyle}>
-          {children}
+    <div className="min-h-screen bg-gray-50 font-sans">
+      <Navbar onPageChange={onPageChange} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 flex gap-6">
+        <Sidebar currentPage={currentPage} onPageChange={onPageChange} userRole={user?.role} isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+        <main className="flex-1 py-6">
+          <div className="card-lg bg-white shadow-sm p-6">{children}</div>
         </main>
       </div>
     </div>

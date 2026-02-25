@@ -11,7 +11,8 @@ app = FastAPI(title="Steel Shop ERP - Backend")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://steelshoperp.onrender.com"
+        "https://steelshoperp.onrender.com",
+        "http://localhost:5173"
     ],
     allow_credentials=True,
     allow_methods=["*"],

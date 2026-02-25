@@ -1,64 +1,58 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '../AuthContext'
 import { Menu, X, Bell, User, LogOut, Settings } from 'lucide-react'
 
 interface NavbarProps {
-  onPageChange: (page: string) => void
+  onPageChange: React.Dispatch<React.SetStateAction<any>>
+  mobileMenuOpen?: boolean
+  setMobileMenuOpen?: (v: boolean) => void
 }
 
-export default function Navbar({ onPageChange }: NavbarProps) {
+export default function Navbar({ onPageChange, mobileMenuOpen = false, setMobileMenuOpen }: NavbarProps) {
   const { user, logout } = useAuth()
   const [showProfileMenu, setShowProfileMenu] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState<boolean>(false)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(typeof window !== 'undefined' ? window.innerWidth <= 768 : false)
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   return (
-    <nav style={navbarStyle}>
-      <div style={navbarLeftStyle}>
-        <button 
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
-          style={mobileMenuButtonStyle}
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-        <div style={logoStyle} onClick={() => onPageChange('dashboard')}>
-          <span style={logoIconStyle}>⚙️</span>
-          <span style={logoTextStyle}>SteelShop ERP</span>
-        </div>
-      </div>
-
-      <div style={navbarRightStyle}>
-        <button style={iconButtonStyle}>
-          <Bell size={20} />
-        </button>
-        
-        <div style={profileContainerStyle}>
-          <button 
-            style={profileButtonStyle}
-            onClick={() => setShowProfileMenu(!showProfileMenu)}
-          >
-            <div style={avatarStyle}>
-              {user?.full_name?.charAt(0) || user?.username?.charAt(0) || 'U'}
+    <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-100 shadow-sm sticky top-0 z-50">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setMobileMenuOpen?.(!mobileMenuOpen)} aria-label="Toggle menu" className="p-2 rounded-md text-gray-600 md:hidden">
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+            <div onClick={() => onPageChange('dashboard')} className="flex items-center gap-3 cursor-pointer">
+              <div className="text-2xl">⚙️</div>
+              <div className="font-bold text-lg text-slate-900">SteelShop ERP</div>
             </div>
-            <span style={userNameStyle}>{user?.full_name || user?.username}</span>
-          </button>
+          </div>
 
-          {showProfileMenu && (
-            <div style={profileMenuStyle}>
-              <div style={profileMenuItemStyle}>
-                <User size={16} />
-                <span>Profile</span>
-              </div>
-              <div style={profileMenuItemStyle}>
-                <Settings size={16} />
-                <span>Settings</span>
-              </div>
-              <div style={profileMenuDividerStyle} />
-              <div style={{...profileMenuItemStyle, color: '#dc2626'}} onClick={logout}>
-                <LogOut size={16} />
-                <span>Logout</span>
-              </div>
+          <div className="flex items-center gap-3">
+            <button className="p-2 rounded-md text-gray-600 hover:bg-gray-50"><Bell size={18} /></button>
+
+            <div className="relative">
+              <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="flex items-center gap-3 p-1 rounded-md hover:bg-gray-50">
+                <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold">{user?.full_name?.charAt(0) || user?.username?.charAt(0) || 'U'}</div>
+                <div className="hidden md:block text-sm font-medium text-slate-900">{user?.full_name || user?.username}</div>
+              </button>
+
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-md border border-gray-100">
+                  <button className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"><User size={16} /><span>Profile</span></button>
+                  <button className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"><Settings size={16} /><span>Settings</span></button>
+                  <div className="border-t border-gray-100" />
+                  <button onClick={logout} className="w-full text-left px-4 py-3 hover:bg-gray-50 text-red-600 flex items-center gap-3"><LogOut size={16} /><span>Logout</span></button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </nav>
@@ -66,9 +60,9 @@ export default function Navbar({ onPageChange }: NavbarProps) {
 }
 
 const navbarStyle: React.CSSProperties = {
-  backgroundColor: '#ffffff',
-  borderBottom: '1px solid #e5e7eb',
-  padding: '0 24px',
+  backgroundColor: 'var(--surface)',
+  borderBottom: '1px solid rgba(15,23,42,0.04)',
+  padding: '0 20px',
   height: '64px',
   display: 'flex',
   alignItems: 'center',
@@ -76,7 +70,7 @@ const navbarStyle: React.CSSProperties = {
   position: 'sticky',
   top: 0,
   zIndex: 50,
-  boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+  boxShadow: 'var(--shadow-sm)'
 }
 
 const navbarLeftStyle: React.CSSProperties = {
@@ -95,6 +89,9 @@ const mobileMenuButtonStyle: React.CSSProperties = {
   color: '#4b5563'
 }
 
+// Show mobile menu button on small screens using a CSS class in index.css
+mobileMenuButtonStyle.display = 'none'
+
 const logoStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
@@ -108,8 +105,8 @@ const logoIconStyle: React.CSSProperties = {
 
 const logoTextStyle: React.CSSProperties = {
   fontSize: '18px',
-  fontWeight: '600',
-  color: '#1f2937'
+  fontWeight: 700,
+  color: '#0f172a'
 }
 
 const navbarRightStyle: React.CSSProperties = {
@@ -168,11 +165,11 @@ const profileMenuStyle: React.CSSProperties = {
   position: 'absolute',
   top: 'calc(100% + 8px)',
   right: 0,
-  backgroundColor: '#ffffff',
+  backgroundColor: 'var(--surface)',
   borderRadius: '12px',
-  boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-  border: '1px solid #e5e7eb',
-  minWidth: '200px',
+  boxShadow: 'var(--shadow-md)',
+  border: '1px solid rgba(15,23,42,0.04)',
+  minWidth: '220px',
   zIndex: 100
 }
 
@@ -191,4 +188,19 @@ const profileMenuDividerStyle: React.CSSProperties = {
   height: '1px',
   backgroundColor: '#e5e7eb',
   margin: '4px 0'
+}
+
+// Add responsive rules via class when loaded (small JS fallback)
+if (typeof window !== 'undefined') {
+  const applyMobileStyles = () => {
+    const w = window.innerWidth
+    if (w <= 768) {
+      // show the mobile button by adding a class to body so CSS can pick it up
+      document.body.classList.add('mobile-xs')
+    } else {
+      document.body.classList.remove('mobile-xs')
+    }
+  }
+  applyMobileStyles()
+  window.addEventListener('resize', applyMobileStyles)
 }

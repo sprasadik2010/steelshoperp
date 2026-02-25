@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../AuthContext'
+import Input from '../components/Input'
+import Button from '../components/Button'
 
 interface Dealer {
   id: number
@@ -52,10 +54,20 @@ export default function DealersPage() {
       {error && <div style={{ color: 'red' }}>{error}</div>}
 
       <form onSubmit={handleCreate} style={{ marginBottom: 20 }}>
-        <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
-        <input placeholder="Phone" value={phone} onChange={e => setPhone(e.target.value)} />
-        <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-        <button type="submit">Create Dealer</button>
+        <div className="grid grid-cols-2" style={{ gap: 12 }}>
+          <div style={{ minWidth: 0 }}>
+            <Input label="Name" placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <Input label="Phone" placeholder="Phone" value={phone} onChange={e => setPhone(e.target.value)} />
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <Input label="Email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', minWidth: 0 }}>
+            <Button type="submit" variant="primary" fullWidth> Create Dealer </Button>
+          </div>
+        </div>
       </form>
 
       <ul>

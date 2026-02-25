@@ -17,71 +17,41 @@ export default function Button({
   fullWidth,
   disabled,
   style,
+  className,
   ...props 
 }: ButtonProps) {
-  const baseStyle: React.CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: disabled || loading ? 'not-allowed' : 'pointer',
-    fontWeight: '500',
-    transition: 'all 0.2s',
-    opacity: disabled || loading ? 0.6 : 1,
-    width: fullWidth ? '100%' : 'auto'
+  const base = [`inline-flex`, `items-center`, `justify-center`, `gap-2`, `rounded-lg`, `font-semibold`, `transition`, `duration-150`, `focus:outline-none`, `focus:ring-2`, `focus:ring-offset-2`]
+
+  if (fullWidth) base.push('w-full')
+
+  const sizeMap: Record<string, string> = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-sm',
+    lg: 'px-5 py-3 text-base'
   }
 
-  const sizeStyles = {
-    sm: { padding: '6px 12px', fontSize: '13px' },
-    md: { padding: '8px 16px', fontSize: '14px' },
-    lg: { padding: '12px 24px', fontSize: '16px' }
+  const variantMap: Record<string, string> = {
+    primary: 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm focus:ring-blue-500',
+    secondary: 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 focus:ring-gray-300',
+    danger: 'bg-red-600 hover:bg-red-700 text-white shadow-sm focus:ring-red-500',
+    success: 'bg-green-600 hover:bg-green-700 text-white shadow-sm focus:ring-green-500',
+    outline: 'bg-transparent border border-gray-200 text-gray-700 hover:bg-gray-50 focus:ring-gray-300'
   }
 
-  const variantStyles = {
-    primary: {
-      backgroundColor: '#2563eb',
-      color: '#ffffff',
-      ':hover': { backgroundColor: '#1d4ed8' }
-    },
-    secondary: {
-      backgroundColor: '#6b7280',
-      color: '#ffffff',
-      ':hover': { backgroundColor: '#4b5563' }
-    },
-    danger: {
-      backgroundColor: '#dc2626',
-      color: '#ffffff',
-      ':hover': { backgroundColor: '#b91c1c' }
-    },
-    success: {
-      backgroundColor: '#16a34a',
-      color: '#ffffff',
-      ':hover': { backgroundColor: '#15803d' }
-    },
-    outline: {
-      backgroundColor: 'transparent',
-      border: '1px solid #d1d5db',
-      color: '#374151',
-      ':hover': { backgroundColor: '#f3f4f6' }
-    }
-  }
+  const classes = [...base, sizeMap[size], variantMap[variant], className || ''].join(' ')
 
   return (
     <button
-      style={{
-        ...baseStyle,
-        ...sizeStyles[size],
-        ...variantStyles[variant],
-        ...style
-      }}
+      className={classes}
       disabled={disabled || loading}
+      style={style}
       {...props}
     >
-      {loading && <span style={spinnerStyle} />}
-      {icon && !loading && <span style={iconStyle}>{icon}</span>}
-      {children}
+      {loading && (
+        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+      )}
+      {icon && !loading && <span className="flex items-center">{icon}</span>}
+      <span>{children}</span>
     </button>
   )
 }

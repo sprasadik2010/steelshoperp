@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import * as Icons from 'lucide-react'
 
 interface SidebarProps {
-  currentPage: string
-  onPageChange: (page: string) => void
+  currentPage: any
+  onPageChange: React.Dispatch<React.SetStateAction<any>>
   userRole?: string
+  isOpen?: boolean
+  onClose?: () => void
 }
 
 interface NavItem {
@@ -40,7 +42,15 @@ const navItems: NavItem[] = [
   { id: 'warranty', label: 'Warranty', icon: 'Shield', roles: ['dealer'] }
 ]
 
-export default function Sidebar({ currentPage, onPageChange, userRole }: SidebarProps) {
+export default function Sidebar({ currentPage, onPageChange, userRole, isOpen = true, onClose }: SidebarProps) {
+  const [isMobile, setIsMobile] = useState<boolean>(false)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(typeof window !== 'undefined' ? window.innerWidth <= 768 : false)
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
   const filteredItems = navItems.filter(item => 
     !userRole ? item.roles.includes('*') : 
     item.roles.includes('*') || item.roles.includes(userRole)
@@ -77,53 +87,55 @@ export default function Sidebar({ currentPage, onPageChange, userRole }: Sidebar
     )
   }
 
+  const combinedStyle: React.CSSProperties = {
+    ...sidebarStyle,
+    ...(isMobile ? {
+      position: 'fixed',
+      top: '64px',
+      left: 0,
+      bottom: 0,
+      width: '80%',
+      maxWidth: '320px',
+      zIndex: 70,
+      transform: isOpen ? 'translateX(0)' : 'translateX(-110%)',
+      transition: 'transform 0.25s ease-in-out',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
+    } : {})
+  }
+  const mobileOverlayClass = isOpen ? 'translate-x-0' : '-translate-x-full'
+
   return (
-    <aside 
-      style={sidebarStyle}
+    <aside
+      className={`bg-white border-r border-gray-100 h-[calc(100vh-64px)] overflow-y-auto ${isMobile ? `fixed z-40 top-16 left-0 bottom-0 w-3/4 max-w-xs transform transition-transform ${mobileOverlayClass}` : 'w-64 sticky top-16'}`}
       role="navigation"
       aria-label="Main navigation"
+      aria-hidden={!isOpen && isMobile}
     >
-      <div style={sidebarContentStyle}>
+      <div className={`px-3 py-2 ${isMobile ? 'flex justify-end' : ''}`}>
+        {isMobile && (
+          <button onClick={onClose} className="p-2 rounded-md text-gray-600">✕</button>
+        )}
+      </div>
+
+      <nav className="px-3 py-2">
         {filteredItems.map((item) => {
           const isActive = currentPage === item.id
           return (
             <button
               key={item.id}
-              onClick={() => onPageChange(item.id)}
+              onClick={() => { onPageChange(item.id); if (isMobile) onClose?.() }}
               onKeyDown={(e) => handleKeyDown(e, item.id)}
-              style={{
-                ...navItemStyle,
-                ...(isActive ? activeNavItemStyle : {})
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = '#f3f4f6'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = 'transparent'
-                }
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 0 2px #2563eb, 0 0 0 4px white'
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.boxShadow = 'none'
-              }}
               aria-current={isActive ? 'page' : undefined}
               role="tab"
               tabIndex={0}
+              className={`w-full flex items-center gap-3 p-2 rounded-md text-left text-sm font-medium ${isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50'}`}
             >
-              <span style={navIconStyle} aria-hidden="true">
-                {renderIcon(item.icon)}
-              </span>
-              <span style={navLabelStyle}>{item.label}</span>
-              {isActive && <span style={activeIndicatorStyle} aria-hidden="true" />}
+              <span className="w-5 flex items-center justify-center text-gray-500">{renderIcon(item.icon)}</span>
+              <span className="flex-1">{item.label}</span>
             </button>
           )
         })}
-      </div>
+      </nav>
     </aside>
   )
 }
@@ -138,6 +150,26 @@ const sidebarStyle: React.CSSProperties = {
   top: '64px',
   overflowY: 'auto',
   boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+}
+
+const sidebarHiddenStyle: React.CSSProperties = {
+  transform: 'translateX(-110%)',
+  position: 'fixed',
+  zIndex: 60,
+  transition: 'transform 0.25s ease-in-out'
+}
+
+const sidebarHeaderStyle: React.CSSProperties = {
+  display: 'none',
+  padding: '12px 16px',
+  borderBottom: '1px solid #e5e7eb'
+}
+
+const mobileSidebarCloseStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  fontSize: '18px',
+  cursor: 'pointer'
 }
 
 const sidebarContentStyle: React.CSSProperties = {

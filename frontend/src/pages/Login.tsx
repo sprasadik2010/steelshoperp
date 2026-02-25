@@ -47,7 +47,7 @@ export default function LoginPage({ onLoginSuccess }: { onLoginSuccess: () => vo
 
   return (
     <div style={containerStyle}>
-      <Card>
+      <Card style={{ width: '420px', maxWidth: '100%' }}>
         <div style={headerStyle}>
           <div style={logoWrapperStyle}>
             <span style={logoStyle}>⚙️</span>
